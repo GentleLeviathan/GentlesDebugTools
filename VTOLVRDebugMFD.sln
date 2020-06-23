@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.757
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VTOLVRDebugMFD", "VTOLVRDebugMFD\VTOLVRDebugMFD.csproj", "{2BDAE866-92DF-42F7-9EC5-FCB08688458B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2BDAE866-92DF-42F7-9EC5-FCB08688458B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BDAE866-92DF-42F7-9EC5-FCB08688458B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BDAE866-92DF-42F7-9EC5-FCB08688458B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BDAE866-92DF-42F7-9EC5-FCB08688458B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {409ED5F4-6AD2-4669-9BBA-49D6EDAEB28A}
+	EndGlobalSection
+EndGlobal
