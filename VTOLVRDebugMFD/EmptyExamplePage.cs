@@ -87,16 +87,13 @@ namespace GentlesDebugTools
         public void InitPage()
         {
             //Here we replace a button on the DebugMFD's Home page to allow us to get to our custom page from the home screen.
-            if (mfd != null)
-            {
-                mfd.home.ReplaceHomePageButton(thisPageButton);
+            mfd.home.ReplaceHomePageButton(thisPageButton);
 
-                //Here we set our page as the active page upon being initialized. You can omit this if you do not desire this functionality.
-                //If we are already the active page OR the active page is currently null
-                if (mfd.activePage.Equals(this._thisPage) || !mfd.activePage.Equals(null))
-                {
-                    mfd.SetPage(_thisPage);
-                }
+            //Here we set our page as the active page upon being initialized. You can omit this if you do not desire this functionality.
+            //If we are already the active page OR the active page is currently null
+            if (mfd.activePage.Equals(this._thisPage) || !mfd.activePage.Equals(null))
+            {
+                mfd.SetPage(_thisPage);
             }
         }
 
@@ -110,7 +107,7 @@ namespace GentlesDebugTools
         //Switch to this page!
         public void SwitchTo()
         {
-            if (mfd != null && !this.thisPage.Equals(new DebugMFDPage()))
+            if (!this.thisPage.Equals(null))
             {
                 mfd.SetPage(_thisPage);
             }
