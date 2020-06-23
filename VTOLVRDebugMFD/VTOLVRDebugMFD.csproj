@@ -117,10 +117,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>D:\Windows.old\Program Files\Steam10\steamapps\common\VTOL VR\VTOLVR_Data\Managed\UnityEngine.VideoModule.dll</HintPath>
     </Reference>
-    <Reference Include="YoutubeExtractor, Version=0.10.11.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\YoutubeExtractor-master\YoutubeExtractor\YoutubeExtractor\bin\Debug\Full\YoutubeExtractor.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DebugMFDHome.cs" />
@@ -136,7 +132,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VehicleFunPage.cs" />
     <Compile Include="WebDisplay.cs" />
-    <Compile Include="YouTubePlayer.cs" />
+    <Compile Include="YoutubeDLPlayer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

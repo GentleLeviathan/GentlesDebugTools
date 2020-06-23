@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System;
+using System.Collections;
 
 namespace GentlesDebugTools
 {
@@ -52,6 +53,7 @@ namespace GentlesDebugTools
 
             SetupVehicle();
             InitButtons();
+            InitTexts();
             InitPage();
         }
 
@@ -79,7 +81,7 @@ namespace GentlesDebugTools
             IncreaseThrustButton = new DebugMFDButton(DebugMFDButtons.Left2, "Incr. Thrust", this.IncreaseThrust);
             DecreaseThrustButton = new DebugMFDButton(DebugMFDButtons.Left3, "Decr. Thrust", this.DecreaseThrust);
             UnlimitedCannonAmmoButton = new DebugMFDButton(DebugMFDButtons.Right4, "Inf. Ammo", this.ToggleInfiniteAmmo);
-            ToggleTimeSlowButton = new DebugMFDButton(DebugMFDButtons.Right2, "Time Slow", this.ToggleTimeSlow);
+            ToggleTimeSlowButton = new DebugMFDButton(DebugMFDButtons.Left4, "Time Slow", this.ToggleTimeSlow);
 
 
             //Button assignment
@@ -166,30 +168,48 @@ namespace GentlesDebugTools
             if(Time.timeScale != 0.25f)
             {
                 Time.timeScale = 0.25f;
-                funPageInfoTexts[DebugMFDInfoTexts.Right2] = "TIME SLOWED TO 0.25";
+                funPageInfoTexts[DebugMFDInfoTexts.Left3] = "TIME SLOWED TO 0.25";
                 UpdateThisPage();
+                StartCoroutine(SlowAudioSourcesInScene(false));
             }
             else
             {
                 Time.timeScale = previousTimeScale;
-                funPageInfoTexts[DebugMFDInfoTexts.Right2] = "TIME REGULAR";
+                funPageInfoTexts[DebugMFDInfoTexts.Left3] = "TIME REGULAR";
                 UpdateThisPage();
+                StartCoroutine(SlowAudioSourcesInScene(true));
             }
+        }
+
+        private IEnumerator SlowAudioSourcesInScene(bool restore)
+        {
+            AudioSource[] allSources = FindObjectsOfType<AudioSource>();
+
+            for(int i = 0; i < allSources.Length; i++)
+            {
+                if (!restore)
+                {
+                    allSources[i].pitch *= 0.25f;
+                }
+                else
+                {
+                    allSources[i].pitch *= 4f;
+                }
+                yield return new WaitForEndOfFrame();
+            }
+
         }
 
         private void UpdateThisPage()
         {
             FunPage.Update(funPageButtons, funPageInfoTexts);
-            if (mfd.activePage.Equals(this.FunPage) || !mfd.activePage.Equals(null))
-            {
-                mfd.SetPage(FunPage);
-            }
+            mfd.UpdatePage();
         }
 
         //Switch to this page!
         public void SwitchTo()
         {
-            if(mfd != null && !this.FunPage.Equals(new DebugMFDPage()))
+            if(mfd != null && !this.FunPage.Equals(null))
             {
                 mfd.SetPage(FunPage);
             }

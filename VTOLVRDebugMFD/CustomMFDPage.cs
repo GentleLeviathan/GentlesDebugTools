@@ -84,11 +84,12 @@ namespace GentlesDebugTools
 
             PageButtons = new Dictionary<DebugMFDButtons, DebugMFDButton>(11);
             InfoTexts = new Dictionary<DebugMFDInfoTexts, string>(10);
-            _thisPage = new DebugMFDPage(PageName, ModName, PageButtons, InfoTexts, PageBackground, LostFocus);
         }
 
         public virtual void Start()
         {
+            _thisPage = new DebugMFDPage(PageName, ModName, PageButtons, InfoTexts, PageBackground, LostFocus);
+
             //Init methods.
             InitButtons();
             InitTexts();
@@ -134,14 +135,14 @@ namespace GentlesDebugTools
         public virtual void UpdateThisPage()
         {
             //For updating the page itself, and pushing the changes to the MFD.
-            thisPage.Update(PageButtons, InfoTexts);
+            _thisPage.Update(PageButtons, InfoTexts);
             mfd.UpdatePage();
         }
 
         //Switch to this page!
         public virtual void SwitchTo()
         {
-            if (!this.thisPage.Equals(null))
+            if (!this._thisPage.Equals(null))
             {
                 mfd.SetPage(_thisPage);
             }

@@ -59,9 +59,9 @@ namespace GentlesDebugTools
             textsSetup = SetupTexts();
             SetupInteractableButtons();
             GoHome();
+            MFDFinished();
             SetupBuiltInPages();
             GoHome();
-            MFDFinished();
         }
 
         private void InitCollections()
@@ -146,16 +146,11 @@ namespace GentlesDebugTools
             {
                 foreach (DebugMFDButtons item in Enum.GetValues(typeof(DebugMFDButtons)))
                 {
-                    if(interactableButtons[item] == null)
-                    {
-                        interactableButtons[item] = model.transform.Find("Buttons/" + item.ToString()).gameObject.AddComponent<VRInteractable>();
-                    }
-                    if(mfdPoseBounds == null)
-                    {
-                        mfdPoseBounds = model.transform.Find("PoseBoundsArea").gameObject.AddComponent<PoseBounds>();
-                        mfdPoseBounds.pose = GloveAnimation.Poses.Point;
-                        mfdPoseBounds.size = new Vector3(2.75f, 2.75f, 0.75f);
-                    }
+                    interactableButtons[item] = model.transform.Find("Buttons/" + item.ToString()).gameObject.AddComponent<VRInteractable>();
+
+                    mfdPoseBounds = model.transform.Find("PoseBoundsArea").gameObject.AddComponent<PoseBounds>();
+                    mfdPoseBounds.pose = GloveAnimation.Poses.Point;
+                    mfdPoseBounds.size = new Vector3(2.75f, 2.75f, 0.75f);
 
                     interactableButtons[item].interactableName = ButtonDescriptions[item].text;
                     interactableButtons[item].OnInteract = new UnityEngine.Events.UnityEvent();
@@ -203,8 +198,8 @@ namespace GentlesDebugTools
         public void SetupBuiltInPages()
         {
             debugMFDModel.AddComponent<VehicleFunPage>();
-            debugMFDModel.AddComponent<InGameLog>();
-            debugMFDModel.AddComponent<YouTubePlayer>();
+            //debugMFDModel.AddComponent<InGameLog>();
+            debugMFDModel.AddComponent<YoutubeDLPlayer>();
         }
 
         private void InitPage()
