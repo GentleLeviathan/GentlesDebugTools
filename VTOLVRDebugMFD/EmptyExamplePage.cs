@@ -144,6 +144,7 @@ namespace VTOLVRDebug
             {
                 InfoTexts[DebugMFDInfoTexts.Left1] = "-";
             }
+            UpdateThisPage();
         }
     }
 }
