@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.IO;
 
-namespace VTOLVRDebugMFD
+namespace GentlesDebugTools
 {
     static class WebDisplay
     {

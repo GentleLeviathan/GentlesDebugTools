@@ -3,7 +3,7 @@ using System.IO;
 using UnityEngine.Events;
 using System.Collections.Generic;
 
-namespace VTOLVRDebug
+namespace GentlesDebugTools
 {
     public static class DebugMFDUtilities
     {

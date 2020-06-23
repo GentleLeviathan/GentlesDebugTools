@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using TMPro;
 
-namespace VTOLVRDebug
+namespace GentlesDebugTools
 {
     public class DebugMFD : MonoBehaviour
     {

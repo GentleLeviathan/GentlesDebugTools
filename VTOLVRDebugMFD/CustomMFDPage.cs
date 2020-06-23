@@ -1,4 +1,4 @@
-﻿namespace VTOLVRDebug
+﻿namespace GentlesDebugTools
 {
     /// <summary>
     /// CustomMFDPage is an interface for custom DebugMFD pages. Inherit this interface after MonoBehavior.

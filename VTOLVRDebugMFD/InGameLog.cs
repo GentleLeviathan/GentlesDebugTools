@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System;
 
-namespace VTOLVRDebug
+namespace GentlesDebugTools
 {
     class InGameLog : MonoBehaviour
     {

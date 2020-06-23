@@ -2,7 +2,7 @@
 using UnityEngine.SceneManagement;
 using System.Collections;
 
-namespace VTOLVRDebug
+namespace GentlesDebugTools
 {
     public class DebugSet : VTOLMOD
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System;
 
-namespace VTOLVRDebug
+namespace GentlesDebugTools
 {
     public class DebugMFDHome : MonoBehaviour
     {

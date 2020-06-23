@@ -9,7 +9,7 @@ using YoutubeExtractor;
 using System.Linq;
 using UnityEngine.Networking;
 
-namespace VTOLVRDebug
+namespace GentlesDebugTools
 {
     class YouTubePlayer : MonoBehaviour, CustomMFDPage
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System;
 
-namespace VTOLVRDebug
+namespace GentlesDebugTools
 {
     /// <summary>
     /// This is an empty example custom DebugMFD page. To make custom pages, copy this page into a class in your own mod solution.
