@@ -138,7 +138,7 @@ namespace VTOLVRDebug
 
         public bool Equals(DebugMFDPage page)
         {
-            if (page.PageName == this.PageName && page.ModName == this.ModName && page.InfoTexts == this.InfoTexts && page.PageBackground == this.PageBackground)
+            if (page.PageName == this.PageName && page.ModName == this.ModName && page.InfoTexts == this.InfoTexts && page.PageBackground == this.PageBackground && page.FocusLost == this.FocusLost)
             {
                 return true;
             }
