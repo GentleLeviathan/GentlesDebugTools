@@ -132,6 +132,7 @@
     <Compile Include="KeepTrack.cs" />
     <Compile Include="InGameLog.cs" />
     <Compile Include="ModTesting.cs" />
+    <Compile Include="Old_EmptyExamplePage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VehicleFunPage.cs" />
     <Compile Include="WebDisplay.cs" />

@@ -32,7 +32,7 @@ namespace GentlesDebugTools
 
         private bool textsSetup = false;
         private bool interactablesSetup = false;
-        private Texture2D defaultPageBackground;
+        public Texture2D defaultPageBackground;
         public string debugtoolsModDirectory;
 
         //Texts
