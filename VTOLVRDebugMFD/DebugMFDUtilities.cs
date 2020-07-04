@@ -3,8 +3,9 @@ using System.IO;
 using UnityEngine.Events;
 using System.Collections.Generic;
 using UnityEngine.Video;
+using System.Threading.Tasks;
 
-namespace GentlesDebugTools
+namespace GentlesDebugTools.MFD
 {
     public static class DebugMFDUtilities
     {
@@ -16,19 +17,8 @@ namespace GentlesDebugTools
             /// <param name="path"></param>
             /// <param name="name"></param>
             /// <returns></returns>
-            public static GameObject GetAssetBundleAsGameObject(string path, string name)
+            public static GameObject GetGameObjectFromAssetBundle(AssetBundle bundle, string name)
             {
-                Debug.Log("AssetBundleLoader: Attempting to load AssetBundle...");
-                AssetBundle bundle = AssetBundle.LoadFromFile(path);
-                if (bundle != null)
-                {
-                    Debug.Log("AssetBundleLoader: Success.");
-                }
-                else
-                {
-                    Debug.Log("AssetBundleLoader: Couldn't load AssetBundle from path: '" + path + "'");
-                }
-
                 Debug.Log("AssetBundleLoader: Attempting to retrieve: '" + name + "' as type: 'GameObject'.");
                 var temp = bundle.LoadAsset(name, typeof(GameObject));
 
@@ -44,14 +34,44 @@ namespace GentlesDebugTools
                 }
             }
 
+            /// <summary>
+            /// Retrieves a specified AssetBundle from "path".
+            /// </summary>
+            /// <param name="path"></param>
+            /// <returns></returns>
+            public static AssetBundle GetAssetBundleFromPath(string path)
+            {
+                Debug.Log("AssetBundleLoader: Attempting to load AssetBundle...");
+                AssetBundle bundle = AssetBundle.LoadFromFile(path);
+                if (bundle != null)
+                {
+                    Debug.Log("AssetBundleLoader: Success.");
+                }
+                else
+                {
+                    Debug.Log("AssetBundleLoader: Couldn't load AssetBundle from path: '" + path + "'");
+                }
+                return bundle;
+            }
+
             public static byte[] GetFileAsBytes(string path)
             {
                 byte[] temp = File.ReadAllBytes(path);
                 return temp;
             }
 
+            public static async Task<byte[]> GetFileAsBytesAsync(string path)
+            {
+                using (FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync: true))
+                {
+                    byte[] buffer = new byte[0x1000];
+                    await fileStream.ReadAsync(buffer, 0, buffer.Length);
+                    return buffer;
+                }
+            }
+
             /// <summary>
-            /// Synchronously loads and returns a Texture2D from 'path'. Include file extension.
+            /// Synchronously loads and returns a Texture2D from 'path'. Include file extension. Default is 2048x2048
             /// </summary>
             /// <param name="path"></param>
             /// <param name="width"></param>
@@ -60,6 +80,20 @@ namespace GentlesDebugTools
             public static Texture2D LoadImageFromFile(string path, int width = 2048, int height = 2048)
             {
                 byte[] temp = GetFileAsBytes(path);
+                Texture2D image = new Texture2D(width, height);
+                image.LoadImage(temp);
+                return image;
+            }
+            /// <summary>
+            /// Asynchronously loads and returns a Texture2D from 'path'. Include file extension. Default is 2048x2048
+            /// </summary>
+            /// <param name="path"></param>
+            /// <param name="width"></param>
+            /// <param name="height"></param>
+            /// <returns></returns>
+            public static async Task<Texture2D> LoadImageFromFileAsync(string path, int width = 2048, int height = 2048)
+            {
+                byte[] temp = await GetFileAsBytesAsync(path);
                 Texture2D image = new Texture2D(width, height);
                 image.LoadImage(temp);
                 return image;

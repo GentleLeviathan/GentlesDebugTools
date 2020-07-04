@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using System;
+using System.IO;
+using GentlesDebugTools.MFD;
 
 namespace GentlesDebugTools
 {
@@ -9,11 +12,13 @@ namespace GentlesDebugTools
         public static bool ReadyForMFD = false;
         public static bool ModTestingMode = false;
         private GameObject DebugMFD;
-        public static DebugSet instance;
+        public static DebugSet _instance;
 
         public delegate void dmfdFinished();
-        public event dmfdFinished _finished;
+        public event dmfdFinished finished;
         public bool DebugMFD_Setup_Finished = false;
+
+        private AssetBundle bundle;
 
         public void Awake()
         {
@@ -21,11 +26,14 @@ namespace GentlesDebugTools
             {
                 DontDestroyOnLoad(this.gameObject);
             }
-            instance = this;
+            _instance = this;
 
             //Setup Events
             SceneManager.sceneLoaded += SceneLoaded;
+            VTOLAPI.MissionReloaded += MissionReloaded;
             base.LogWarning("DebugTools: Awake()");
+
+            bundle = DebugMFDUtilities.FileLoader.GetAssetBundleFromPath(Directory.GetCurrentDirectory() + @"\VTOLVR_ModLoader\mods\Gentle's Debug Tools\" + "debugmfdmodel.mhtasset");
         }
 
         public override void ModLoaded()
@@ -35,7 +43,6 @@ namespace GentlesDebugTools
             if(this.gameObject != null)
             {
                 DontDestroyOnLoad(this.gameObject);
-                base.Log("DebugTools: this.gameobject is not null.");
             }
 
             //If we are in testing mode, immediately load a freeflight using the last used vehicle from the pilot save.
@@ -61,6 +68,12 @@ namespace GentlesDebugTools
             }
         }
 
+        private void MissionReloaded()
+        {
+            ReadyForMFD = true;
+            StartCoroutine(MFDWaiter());
+        }
+
         private IEnumerator MFDWaiter()
         {
             yield return new WaitForSeconds(5f);
@@ -77,6 +90,7 @@ namespace GentlesDebugTools
 
                 GameObject pv;
                 DebugMFD = new GameObject("DebugMFD", typeof(DebugMFD));
+                DebugMFD.GetComponent<DebugMFD>().bundle = bundle;
                 if(VTOLAPI.GetPlayersVehicleEnum() != VTOLVehicles.None)
                 {
                     pv = VTOLAPI.GetPlayersVehicleGameObject();
@@ -116,7 +130,7 @@ namespace GentlesDebugTools
 
         public void DebugMFDFinished()
         {
-            _finished?.Invoke();
+            finished?.Invoke();
             DebugMFD_Setup_Finished = true;
         }
     }

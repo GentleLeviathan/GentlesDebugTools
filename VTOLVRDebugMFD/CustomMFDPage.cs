@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System;
+using System.Collections;
 
-namespace GentlesDebugTools
+namespace GentlesDebugTools.MFD
 {
     /// <summary>
     /// CustomMFDPage is an interface for custom DebugMFD pages. Inherit this interface after MonoBehavior.
@@ -68,10 +69,11 @@ namespace GentlesDebugTools
         public Dictionary<DebugMFDButtons, DebugMFDButton> PageButtons;
         public Texture2D PageBackground;
         public DebugMFDPage _thisPage;
+        public bool PageExecutionPaused = false;
 
         public string PageButtonName = "Empty Example Page";
-        public DebugMFDButton homeButton { get => new DebugMFDButton(DebugMFDButtons.TopMiddle, "HOME", mfd.GoHome); }
-        public DebugMFDButton thisPageButton { get => new DebugMFDButton(DebugMFDButtons.TopRight, PageButtonName, this.SwitchTo); }
+        public DebugMFDButtons PageButtonPosition;
+        public DebugMFDButton thisPageButton;
 
         public string PageName = "EXAMPLE";
         public string ModName = "DebugMFD";
@@ -80,22 +82,40 @@ namespace GentlesDebugTools
         {
             //Get the DebugMFD itself. If it is null, log the error and destroy this page to avoid further exceptions.
             mfd = DebugMFD.instance ? DebugMFD.instance : null;
-            if (!DebugSet.instance.DebugMFD_Setup_Finished || mfd == null) { Debug.LogError(ModName + ": DebugMFD instance was null! DebugTools mod was not loaded/initialized first, or there was an issue with the DebugMFD's creation. Please check your player log."); Destroy(this); }
+            if (!DebugSet._instance.DebugMFD_Setup_Finished || mfd == null) { Debug.LogError(ModName + ": DebugMFD instance was null! DebugTools mod was not loaded/initialized first, or there was an issue with the DebugMFD's creation. Please check your player log."); Destroy(this); }
 
             PageButtons = new Dictionary<DebugMFDButtons, DebugMFDButton>(11);
             InfoTexts = new Dictionary<DebugMFDInfoTexts, string>(10);
+            thisPageButton = new DebugMFDButton(PageButtonPosition, PageButtonName, this.SwitchTo);
         }
 
         public virtual void Start()
         {
-            _thisPage = new DebugMFDPage(PageName, ModName, PageButtons, InfoTexts, PageBackground, LostFocus);
-
             //Init methods.
             InitButtons();
             InitTexts();
             InitPage();
         }
 
+        private void Update()
+        {
+            if (!PageExecutionPaused)
+            {
+                MFDUpdate();
+            }
+        }
+
+        /// <summary>
+        /// Called every frame if the page is not paused. Use as substitute for Update() if pause functionality is required. Recommended.
+        /// </summary>
+        public virtual void MFDUpdate()
+        {
+
+        }
+
+        /// <summary>
+        /// Initializes the required Page Buttons dictionary and sets them to empty buttons with dashes by default.
+        /// </summary>
         public virtual void InitButtons()
         {
             //This initializes the DebugMFDButtons at each position on the page.
@@ -106,54 +126,73 @@ namespace GentlesDebugTools
 
             //Assign the REQUIRED Home button to be able to get back to the DebugMFD's Home page.
             //Don't forget to do this!
-            PageButtons[DebugMFDButtons.TopMiddle] = homeButton;
+            PageButtons[DebugMFDButtons.TopMiddle] = mfd.homeButton;
         }
 
+
+        /// <summary>
+        /// Initializes the required Info Text dictionary and sets them to strings with dashes by default.
+        /// </summary>
         public virtual void InitTexts()
         {
-            //This initializes the DebugMFDInfoTexts at each position on the page.
             foreach (DebugMFDInfoTexts item in Enum.GetValues(typeof(DebugMFDInfoTexts)))
             {
-                //Place dashes in the info texts because they are empty!
                 InfoTexts[item] = "-";
             }
         }
 
+        /// <summary>
+        /// Initializes the page and replaces a button on the home page with a button to get to this page.
+        /// </summary>
         public virtual void InitPage()
         {
+            _thisPage = new DebugMFDPage(PageName, ModName, PageButtons, InfoTexts, PageBackground, LostFocus);
             //Here we replace a button on the DebugMFD's Home page to allow us to get to our custom page from the home screen.
             mfd.home.ReplaceHomePageButton(thisPageButton);
-
-            //Here we set our page as the active page upon being initialized. You can omit this if you do not desire this functionality.
-            //If we are already the active page OR the active page is currently null
-            if (mfd.activePage.Equals(this._thisPage) || !mfd.activePage.Equals(null))
-            {
-                mfd.SetPage(_thisPage);
-            }
         }
 
+        /// <summary>
+        /// Call when you wish to upate the page and push the changes to the MFD. Can be done every frame if necessary.
+        /// </summary>
         public virtual void UpdateThisPage()
         {
-            //For updating the page itself, and pushing the changes to the MFD.
             _thisPage.Update(PageButtons, InfoTexts);
             mfd.UpdatePage();
         }
 
-        //Switch to this page!
+        /// <summary>
+        /// This is called when "thisPageButton" on the home page is pressed.
+        /// Switches to this page.
+        /// </summary>
         public virtual void SwitchTo()
         {
-            if (!this._thisPage.Equals(null))
-            {
-                mfd.SetPage(_thisPage);
-            }
+            if (this._thisPage.Equals(null)) { Debug.LogError(this.PageName + ": _thisPage was not initialized. Can not switch to this page. Did you modify or make an error in the DebugMFDPage constructor?"); return; }
+            mfd.SetPage(_thisPage);
+            UnpausePageExecution();
         }
 
-        //Called when this page loses focus (the DebugMFD displays a different page).
-        //For this to work, you must pass it as the final argument in your DebugMFDPage constructor.
-        //Can be omitted if this functionality is not required.
+        /// <summary>
+        /// Called when this page loses focus (the DebugMFD displays a different page).
+        /// Logic can be omitted if this functionality is not required.
+        /// </summary>
         public virtual void LostFocus()
         {
+            PausePageExecution();
+        }
 
+        /// <summary>
+        /// Pauses execution of focus-oriented logic. Used alongside MFDUpdate().
+        /// </summary>
+        public void PausePageExecution()
+        {
+            PageExecutionPaused = true;
+        }
+        /// <summary>
+        /// Allows execution of focus-oriented logic. Used alongside MFDUpdate().
+        /// </summary>
+        public void UnpausePageExecution()
+        {
+            PageExecutionPaused = false;
         }
     }
 }

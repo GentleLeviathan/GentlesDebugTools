@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System;
 
-namespace GentlesDebugTools
+namespace GentlesDebugTools.MFD
 {
     class InGameLog : MonoBehaviour
     {

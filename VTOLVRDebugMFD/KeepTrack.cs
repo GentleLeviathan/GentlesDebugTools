@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System;
 
-namespace GentlesDebugTools
+namespace GentlesDebugTools.MFD
 {
     class KeepTrack : MonoBehaviour
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System;
 using System.Collections;
 
-namespace GentlesDebugTools
+namespace GentlesDebugTools.MFD
 {
     class VehicleFunPage : MonoBehaviour
     {
@@ -195,9 +195,9 @@ namespace GentlesDebugTools
                 {
                     allSources[i].pitch *= 4f;
                 }
-                yield return new WaitForEndOfFrame();
+                //yield return new WaitForEndOfFrame();
             }
-
+            yield return null;
         }
 
         private void UpdateThisPage()

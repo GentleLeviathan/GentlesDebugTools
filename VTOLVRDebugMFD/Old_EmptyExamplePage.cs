@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System;
 
-namespace GentlesDebugTools
+namespace GentlesDebugTools.MFD
 {
     /// <summary>
     /// Thank GOD this is gone.
@@ -29,7 +29,7 @@ namespace GentlesDebugTools
         {
             //Get the DebugMFD itself. If it is null, log the error and destroy this page to avoid further exceptions.
             mfd = DebugMFD.instance ? DebugMFD.instance : null;
-            if (!DebugSet.instance.DebugMFD_Setup_Finished || mfd == null) { Debug.LogError(ModName + ": DebugMFD instance was null! DebugTools mod was not loaded/initialized first, or there was an issue with the DebugMFD's creation. Please check your player log."); Destroy(this); }
+            if (!DebugSet._instance.DebugMFD_Setup_Finished || mfd == null) { Debug.LogError(ModName + ": DebugMFD instance was null! DebugTools mod was not loaded/initialized first, or there was an issue with the DebugMFD's creation. Please check your player log."); Destroy(this); }
 
             //Page 'wallpaper'. Can be loaded with the included synchronous static FileLoader utility, or via another method.
             PageBackground = DebugMFDUtilities.FileLoader.LoadImageFromFile(mfd.debugtoolsModDirectory + "Backgrounds/default.png");

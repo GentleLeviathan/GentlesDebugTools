@@ -3,21 +3,24 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using TMPro;
+using System.Collections;
 
-namespace GentlesDebugTools
+namespace GentlesDebugTools.MFD
 {
     public class DebugMFD : MonoBehaviour
     {
         //Public vars
         public static DebugMFD instance;
 
+        public AssetBundle bundle;
+
         public Animator DebugMFDAnimator;
         public Material ScreenBackground;
 
         //DebugMFD Pages + Buttons
+        public DebugMFDButton homeButton;
         public List<DebugMFDPage> DebugMFDPages;
         public Dictionary<DebugMFDPage, List<DebugMFDButton>> PageButtons;
-        //private Dictionary<DebugMFDButtons, NoClickButton> noClickButtons;
         private Dictionary<DebugMFDButtons, VRInteractable> interactableButtons;
 
         public DebugMFDPage activePage;
@@ -50,14 +53,25 @@ namespace GentlesDebugTools
             instance = this;
 
             debugtoolsModDirectory = Directory.GetCurrentDirectory() + @"\VTOLVR_ModLoader\mods\Gentle's Debug Tools\";
-            debugset = DebugSet.instance;
+            debugset = DebugSet._instance;
 
             defaultPageBackground = DebugMFDUtilities.FileLoader.LoadImageFromFile(debugtoolsModDirectory + "Backgrounds/default.png");
 
+            homeButton = new DebugMFDButton(DebugMFDButtons.TopMiddle, "HOME", GoHome);
+
             InitCollections();
+            StartCoroutine(AwaitAssetBundle());
+        }
+
+        private IEnumerator AwaitAssetBundle()
+        {
+            while(bundle == null)
+            {
+                yield return null;
+            }
             InitDebugMFD();
             textsSetup = SetupTexts();
-            SetupInteractableButtons();
+            SetupInteractableButtons(true);
             GoHome();
             MFDFinished();
             SetupBuiltInPages();
@@ -84,18 +98,23 @@ namespace GentlesDebugTools
             debugMFDModel.transform.parent = this.transform;
             debugMFDModel.transform.localPosition = new Vector3(0, 0.5817f, 5.53f);
 
-            Debug.Log("DebugMFD: Attempting to retrieve AssetBundle: 'debugmfdmodel' from: '" + debugtoolsModDirectory + "debugmfdmodel.mhtasset'");
-            GameObject modelprefab = DebugMFDUtilities.FileLoader.GetAssetBundleAsGameObject(debugtoolsModDirectory + "debugmfdmodel.mhtasset", "DebugMFD.prefab");
+            GameObject modelprefab = null;
+            if (bundle == null)
+            {
+                bundle = DebugMFDUtilities.FileLoader.GetAssetBundleFromPath(debugtoolsModDirectory + "debugmfdmodel.mhtasset");
+            }
+            modelprefab = DebugMFDUtilities.FileLoader.GetGameObjectFromAssetBundle(bundle, "DebugMFD.prefab");
             if (modelprefab == null)
             {
-                Debug.Log("DebugMFD: 'modelprefab' is null. We got problems.");
+                Debug.Log("DebugMFD: 'modelprefab' is null, 'DebugMFD.prefab' couldn't be loaded. Did you modify the MFD asset bundle?");
+                return;
             }
             model = Instantiate(modelprefab, debugMFDModel.transform);
             if (model != null)
             {
                 //Set the transform
                 model.transform.localPosition = Vector3.zero;
-                model.transform.rotation = Quaternion.Euler(new Vector3(-120f, 180f, 0f));
+                model.transform.localRotation = Quaternion.Euler(new Vector3(-120f, 180f, 0f));
 
                 Debug.Log("DebugMFD: Object name: " + model.name);
                 DebugMFDAnimator = model.GetComponent<Animator>();
@@ -106,7 +125,7 @@ namespace GentlesDebugTools
             }
             else
             {
-                Debug.Log("DebugMFD: 'model' is null, no clue what's happening there. Better restart, again!");
+                Debug.Log("DebugMFD: Instantiated 'model' is null, no clue what's happening there. Check errors above this?");
             }
         }
 
@@ -140,7 +159,7 @@ namespace GentlesDebugTools
             }
         }
 
-        private void SetupInteractableButtons()
+        private void SetupInteractableButtons(bool updateInteractables, bool logChanges = false)
         {
             if (!interactablesSetup)
             {
@@ -164,7 +183,7 @@ namespace GentlesDebugTools
             {
                 if (!activePage.Equals(null))
                 {
-                    Debug.Log("DebugMFD: activePage was not null, setting up VRInteractable Buttons for:" + activePage.PageName);
+                    if (logChanges) { Debug.Log("DebugMFD: activePage was not null, setting up VRInteractable Buttons for:" + activePage.PageName); }
                     foreach (DebugMFDButtons item in Enum.GetValues(typeof(DebugMFDButtons)))
                     {
                         interactableButtons[item].OnInteract.RemoveAllListeners();
@@ -172,7 +191,7 @@ namespace GentlesDebugTools
                         {
                             interactableButtons[item].OnInteract.AddListener(activePage.PageButtons[item].ButtonPressedEvent);
                         }
-                        Debug.Log(interactableButtons[item].gameObject.name + " - " + activePage.PageButtons[item].ButtonDescription);
+                        if (logChanges) { Debug.Log(interactableButtons[item].gameObject.name + " - " + activePage.PageButtons[item].ButtonDescription); }
 
                         interactableButtons[item].interactableName = ButtonDescriptions[item].text;
                     }
@@ -198,7 +217,7 @@ namespace GentlesDebugTools
         public void SetupBuiltInPages()
         {
             debugMFDModel.AddComponent<VehicleFunPage>();
-            //debugMFDModel.AddComponent<InGameLog>();
+            debugMFDModel.AddComponent<DebugLog>();
             debugMFDModel.AddComponent<YoutubeDLPlayer>();
         }
 
@@ -226,23 +245,70 @@ namespace GentlesDebugTools
             }
         }
 
+        private void UpdateInitPage()
+        {
+            if (activePage.Equals(null)) { return; }
+            foreach (DebugMFDInfoTexts item in Enum.GetValues(typeof(DebugMFDInfoTexts)))
+            {
+                this.InfoTexts[item].text = activePage.InfoTexts[item];
+            }
+            foreach (DebugMFDButtons item in Enum.GetValues(typeof(DebugMFDButtons)))
+            {
+                this.ButtonDescriptions[item].text = activePage.PageButtons[item].ButtonDescription;
+            }
+            PageName.text = activePage.PageName;
+            ModName.text = activePage.ModName;
+            if (activePage.PageBackground != null)
+            {
+                ScreenBackground.SetTexture("_MainTex", activePage.PageBackground);
+            }
+            else
+            {
+                ScreenBackground.SetTexture("_MainTex", defaultPageBackground);
+            }
+        }
+
         public void SetPage(DebugMFDPage page)
         {
             activePage.LostFocusSend();
+
+            //Home page button requirement check.
+            if (!page.PageButtons[DebugMFDButtons.TopMiddle].Equals(homeButton))
+            {
+                page.PageButtons[DebugMFDButtons.TopMiddle] = homeButton;
+                Debug.LogWarning("DebugMFD: CustomPage - '" + page.PageName + "' attempted to set the home button to something else. This is not allowed.");
+            }
+
             activePage = page;
             if (!DebugMFDPages.Contains(page))
             {
                 DebugMFDPages.Add(page);
             }
             Debug.Log("DebugMFD: Set '" + page.PageName + "' as activePage.");
-            SetupInteractableButtons();
+
+            SetupInteractableButtons(true, true);
             InitPage();
         }
 
-        public void UpdatePage()
+        public void UpdatePage(bool updateInteractables = true)
         {
-            SetupInteractableButtons();
-            InitPage();
+            SetupInteractableButtons(updateInteractables);
+            UpdateInitPage();
+        }
+
+        public int FS1_SetPage(int pageNumber)
+        {
+            if (InfoTexts[DebugMFDInfoTexts.FS1].isTextOverflowing)
+            {
+                InfoTexts[DebugMFDInfoTexts.FS1].pageToDisplay = pageNumber;
+                return pageNumber;
+            }
+            return InfoTexts[DebugMFDInfoTexts.FS1].pageToDisplay;
+        }
+
+        public bool IsTextOverflowing(DebugMFDInfoTexts position)
+        {
+            return InfoTexts[position].isTextOverflowing;
         }
     }
 }
