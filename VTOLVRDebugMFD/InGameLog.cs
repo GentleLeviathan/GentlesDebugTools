@@ -46,7 +46,8 @@ namespace GentlesDebugTools.MFD
             StartCoroutine(OutOfRangeHandler());
         }
 
-        private IEnumerator OutOfRangeHandler()
+        //Didn't work, will fix later, replaced for now
+        /*private IEnumerator OutOfRangeHandler()
         {
             int totalNumbers = 0;
             for (int i = 0; i < orderedMessages.Count; i++)
@@ -71,6 +72,31 @@ namespace GentlesDebugTools.MFD
                     orderedMessages[i] = (string)temp.GetValue(i);
                     //yield return new WaitForSeconds(0.001f);
                 }
+            }
+            yield return new WaitForSeconds(0.001f);
+            UpdateDisplay();
+        }*/
+
+        private IEnumerator OutOfRangeHandler()
+        {
+            int totalNumbers = 0;
+            for (int i = 0; i < orderedMessages.Count; i++)
+            {
+                foreach (char c in orderedMessages[i])
+                {
+                    totalNumbers++;
+                }
+                if (orderedMessages[i].Contains("\n"))
+                {
+                    totalNumbers += 58;
+                }
+                //yield return new WaitForSeconds(0.001f);
+            }
+            if (totalNumbers > MaxCharacters - 58)
+            {
+                string last = orderedMessages[orderedMessages.Count - 1];
+                orderedMessages.Clear();
+                orderedMessages.Add(last);
             }
             yield return new WaitForSeconds(0.001f);
             UpdateDisplay();

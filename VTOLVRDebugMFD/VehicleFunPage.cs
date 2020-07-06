@@ -5,6 +5,9 @@ using System.Collections;
 
 namespace GentlesDebugTools.MFD
 {
+    /// <summary>
+    /// TODO: Replace with a CustomMFDPage implementation.
+    /// </summary>
     class VehicleFunPage : MonoBehaviour
     {
         private DebugMFD mfd;

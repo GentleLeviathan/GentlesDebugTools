@@ -4,6 +4,9 @@ using System;
 
 namespace GentlesDebugTools.MFD
 {
+    /// <summary>
+    /// TODO: Get rid of this!
+    /// </summary>
     class KeepTrack : MonoBehaviour
     {
         private DebugMFD mfd;

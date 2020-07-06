@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
 using System.Collections;
-using System;
 using System.IO;
 using GentlesDebugTools.MFD;
 
@@ -11,13 +9,14 @@ namespace GentlesDebugTools
     {
         public static bool ReadyForMFD = false;
         public static bool ModTestingMode = false;
-        private GameObject DebugMFD;
         public static DebugSet _instance;
+        public static string vIndex = "v0.4a";
 
         public delegate void dmfdFinished();
         public event dmfdFinished finished;
         public bool DebugMFD_Setup_Finished = false;
 
+        private GameObject DebugMFD;
         private AssetBundle bundle;
 
         public void Awake()
@@ -29,7 +28,7 @@ namespace GentlesDebugTools
             _instance = this;
 
             //Setup Events
-            SceneManager.sceneLoaded += SceneLoaded;
+            VTOLAPI.SceneLoaded += SceneLoaded;
             VTOLAPI.MissionReloaded += MissionReloaded;
             base.LogWarning("DebugTools: Awake()");
 
@@ -53,10 +52,9 @@ namespace GentlesDebugTools
         }
 
 
-        private void SceneLoaded(Scene arg0, LoadSceneMode arg1)
+        private void SceneLoaded(VTOLScenes scene)
         {
-            //If we are in a scene that contains a player-controlled plane (GameRig is just the SteamVR Rig and accompanying stuffs, not a plane)
-            if(arg0.name == "CustomMapBase" || arg0.name == "Akutan")
+            if(scene == VTOLScenes.Akutan || scene == VTOLScenes.CustomMapBase)
             {
                 ReadyForMFD = true;
                 StartCoroutine(MFDWaiter());
@@ -105,7 +103,7 @@ namespace GentlesDebugTools
                     {
                         DebugMFD.transform.parent = pv.transform;
                         DebugMFD.transform.localPosition = Vector3.zero;
-                        DebugMFD.transform.localRotation = Quaternion.Euler(Vector3.zero);
+                        DebugMFD.transform.localRotation = Quaternion.identity;
 
                     }
                     else

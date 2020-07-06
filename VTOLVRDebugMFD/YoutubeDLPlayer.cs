@@ -4,7 +4,6 @@ using System;
 using System.Diagnostics;
 using System.Collections;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using System.IO;
 
 namespace GentlesDebugTools.MFD
@@ -25,6 +24,7 @@ namespace GentlesDebugTools.MFD
         {
             PageName = "";
             ModName = "";
+            PageButtonName = "YT Player";
 
             base.Awake();
         }
@@ -32,7 +32,6 @@ namespace GentlesDebugTools.MFD
         public override void Start()
         {
             PageBackground = DebugMFDUtilities.FileLoader.LoadImageFromFile(mfd.debugtoolsModDirectory + "Backgrounds/loading.png");
-            PageButtonName = "Youtube Player";
 
             base.Start();
 
@@ -70,14 +69,19 @@ namespace GentlesDebugTools.MFD
         {
             base.InitButtons();
 
+            foreach (DebugMFDButtons item in Enum.GetValues(typeof(DebugMFDButtons)))
+            {
+                PageButtons[item] = new DebugMFDButton(item, "");
+            }
+
             //Play/Pause buttons
             PageButtons[DebugMFDButtons.TopLeft] = new DebugMFDButton(DebugMFDButtons.TopLeft, "Play", this.Play);
             PageButtons[DebugMFDButtons.TopRight] = new DebugMFDButton(DebugMFDButtons.TopRight, "Pause", this.Pause);
-            PageButtons[DebugMFDButtons.Right1] = new DebugMFDButton(DebugMFDButtons.Right1, "VOL+", this.VolumeUp);
-            PageButtons[DebugMFDButtons.Right2] = new DebugMFDButton(DebugMFDButtons.Right2, "VOL-", this.VolumeDown);
-            PageButtons[DebugMFDButtons.Right3] = new DebugMFDButton(DebugMFDButtons.Right3, "NEXT", this.NextVideo);
-            PageButtons[DebugMFDButtons.Right4] = new DebugMFDButton(DebugMFDButtons.Right4, "PREV", this.PreviousVideo);
-            PageButtons[DebugMFDButtons.Left4] = new DebugMFDButton(DebugMFDButtons.Left4, "PLAY-IN-BG", this.PlayInBackgroundToggle);
+            PageButtons[DebugMFDButtons.Right1] = new DebugMFDButton(DebugMFDButtons.Right1, "                 VOL+", this.VolumeUp);
+            PageButtons[DebugMFDButtons.Right2] = new DebugMFDButton(DebugMFDButtons.Right2, "                 VOL-", this.VolumeDown);
+            PageButtons[DebugMFDButtons.Right3] = new DebugMFDButton(DebugMFDButtons.Right3, "                 NEXT", this.NextVideo);
+            PageButtons[DebugMFDButtons.Right4] = new DebugMFDButton(DebugMFDButtons.Right4, "                 PREV", this.PreviousVideo);
+            PageButtons[DebugMFDButtons.Left4] = new DebugMFDButton(DebugMFDButtons.Left4, "\nPLAY-IN-BG", this.PlayInBackgroundToggle);
         }
 
         public override void InitTexts()
@@ -104,6 +108,8 @@ namespace GentlesDebugTools.MFD
         public override void SwitchTo()
         {
             base.SwitchTo();
+
+            Play();
         }
 
         public override void LostFocus()
@@ -120,6 +126,10 @@ namespace GentlesDebugTools.MFD
             if (videoPlayer.url != "")
             {
                 mfd.ScreenBackground.SetTexture("_MainTex", rT);
+                if (!videoPlayer.isPlaying)
+                {
+                    StartCoroutine(WaitForVideoEnd());
+                }
                 videoPlayer.Play();
             }
         }
@@ -129,6 +139,15 @@ namespace GentlesDebugTools.MFD
             if (videoPlayer.isPlaying)
             {
                 videoPlayer.Pause();
+            }
+        }
+
+        private IEnumerator WaitForVideoEnd()
+        {
+            yield return new WaitForSecondsRealtime((float)videoPlayer.length + 1f);
+            if (!videoPlayer.isPlaying)
+            {
+                NextVideo();
             }
         }
 
@@ -148,7 +167,6 @@ namespace GentlesDebugTools.MFD
                 };
                 Process downloader = Process.Start(info);
                 downloader.OutputDataReceived += ManualDownloaderDataReceived;
-                //downloader.Exited += FinishedManualDownload;
                 StartCoroutine(ManualDownloadChecker(downloader, i));
             }
         }

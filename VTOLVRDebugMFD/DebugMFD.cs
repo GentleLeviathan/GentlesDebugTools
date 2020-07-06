@@ -91,12 +91,26 @@ namespace GentlesDebugTools.MFD
 
         private void InitDebugMFD()
         {
-            GameObject DefaultCube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            DefaultCube.transform.position = Vector3.up * -500f;
-
             debugMFDModel = new GameObject("DebugMFD_Instance");
             debugMFDModel.transform.parent = this.transform;
-            debugMFDModel.transform.localPosition = new Vector3(0, 0.5817f, 5.53f);
+
+            switch (VTOLAPI.GetPlayersVehicleEnum())
+            {
+                case VTOLVehicles.AV42C:
+                    debugMFDModel.transform.localPosition = new Vector3(0, 0.237f, 0.123f);
+                    break;
+                case VTOLVehicles.F45A:
+                    debugMFDModel.transform.localPosition = new Vector3(0, 0.26f, 5.8f);
+                    break;
+                case VTOLVehicles.FA26B:
+                    debugMFDModel.transform.localPosition = new Vector3(0, 0.5817f, 5.53f);
+                    break;
+                case VTOLVehicles.None:
+                    debugMFDModel.transform.localPosition = new Vector3(0, 0.5817f, 5.53f);
+                    break;
+            }
+
+            debugMFDModel.transform.localRotation = Quaternion.identity;
 
             GameObject modelprefab = null;
             if (bundle == null)

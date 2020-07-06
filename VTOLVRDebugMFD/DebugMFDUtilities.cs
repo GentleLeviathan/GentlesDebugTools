@@ -2,7 +2,6 @@
 using System.IO;
 using UnityEngine.Events;
 using System.Collections.Generic;
-using UnityEngine.Video;
 using System.Threading.Tasks;
 
 namespace GentlesDebugTools.MFD
@@ -101,16 +100,26 @@ namespace GentlesDebugTools.MFD
         }
     }
 
+    /// <summary>
+    /// All of the button positions on the DebugMFD.
+    /// </summary>
     public enum DebugMFDButtons
     {
         Left1, Left2, Left3, Left4, Right1, Right2, Right3, Right4, TopLeft, TopMiddle, TopRight
     }
 
+    /// <summary>
+    /// All of the information texts on the DebugMFD. 1-4 is Top-Bottom. FS1 is the "full screen" text.
+    /// </summary>
     public enum DebugMFDInfoTexts
     {
         Left1, Left2, Left3, Middle1, Middle2, Middle3, Right1, Right2, Right3, FS1
     }
 
+
+    /// <summary>
+    /// The page descriptors that are utilized by the DebugMFD.
+    /// </summary>
     public struct DebugMFDPage
     {
         public string PageName;
@@ -143,11 +152,20 @@ namespace GentlesDebugTools.MFD
             this.FocusLost = focusLostEvent;
         }
 
+        /// <summary>
+        /// Returns an identical copy of this page.
+        /// </summary>
+        /// <returns></returns>
         public DebugMFDPage Copy()
         {
             return new DebugMFDPage(PageName, ModName, PageButtons, InfoTexts, FocusLost);
         }
 
+        /// <summary>
+        /// Returns an identical copy of this page.
+        /// </summary>
+        /// <param name="PageBackground"></param>
+        /// <returns></returns>
         public DebugMFDPage Copy(Texture2D PageBackground)
         {
             return new DebugMFDPage(PageName, ModName, PageButtons, InfoTexts, PageBackground, FocusLost);
@@ -166,11 +184,19 @@ namespace GentlesDebugTools.MFD
             this.PageBackground = PageBackground;
         }
 
+        /// <summary>
+        /// Informs the page it has lost focus.
+        /// </summary>
         public void LostFocusSend()
         {
             this.FocusLost?.Invoke();
         }
 
+        /// <summary>
+        /// Returns true if these pages are identical.
+        /// </summary>
+        /// <param name="page"></param>
+        /// <returns></returns>
         public bool Equals(DebugMFDPage page)
         {
             if (page.PageName == this.PageName && page.ModName == this.ModName && page.InfoTexts == this.InfoTexts && page.PageBackground == this.PageBackground && page.FocusLost == this.FocusLost)
@@ -182,12 +208,75 @@ namespace GentlesDebugTools.MFD
                 return false;
             }
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 1527807641;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(PageName);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ModName);
+            hashCode = hashCode * -1521134295 + EqualityComparer<Dictionary<DebugMFDInfoTexts, string>>.Default.GetHashCode(InfoTexts);
+            hashCode = hashCode * -1521134295 + EqualityComparer<Dictionary<DebugMFDButtons, DebugMFDButton>>.Default.GetHashCode(PageButtons);
+            hashCode = hashCode * -1521134295 + EqualityComparer<Texture2D>.Default.GetHashCode(PageBackground);
+            return hashCode;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if(obj is DebugMFDPage page)
+            {
+                if (page.PageName == this.PageName && page.ModName == this.ModName && page.InfoTexts == this.InfoTexts && page.PageBackground == this.PageBackground && page.FocusLost == this.FocusLost)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        public static bool operator ==(DebugMFDPage lhs, DebugMFDPage rhs)
+        {
+            if (rhs.PageName == lhs.PageName && rhs.ModName == lhs.ModName && rhs.InfoTexts == lhs.InfoTexts && rhs.PageBackground == lhs.PageBackground && rhs.FocusLost == lhs.FocusLost)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public static bool operator !=(DebugMFDPage lhs, DebugMFDPage rhs)
+        {
+            if (rhs.PageName != lhs.PageName && rhs.ModName != lhs.ModName && rhs.InfoTexts != lhs.InfoTexts && rhs.PageBackground != lhs.PageBackground && rhs.FocusLost != lhs.FocusLost)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 
+    /// <summary>
+    /// The interactable buttons on the top and sides of the MFD.
+    /// </summary>
     public struct DebugMFDButton
     {
+        /// <summary>
+        /// Button's position on the DebugMFD.
+        /// </summary>
         public DebugMFDButtons ButtonPosition;
+        /// <summary>
+        /// The description of the button displayed on the MFD and the tooltip.
+        /// </summary>
         public string ButtonDescription;
+        /// <summary>
+        /// The action that is invoked when the button is pressed.
+        /// </summary>
         public UnityAction ButtonPressedEvent;
 
         public DebugMFDButton(DebugMFDButtons ButtonPosition, string ButtonDescription)
@@ -204,14 +293,63 @@ namespace GentlesDebugTools.MFD
             this.ButtonPressedEvent = ButtonPressedEvent;
         }
 
-        public void Update()
-        {
-
-        }
-
+        /// <summary>
+        /// Returns true if these buttons are identical.
+        /// </summary>
+        /// <param name="button"></param>
+        /// <returns></returns>
         public bool Equals(DebugMFDButton button)
         {
             if(button.ButtonDescription == this.ButtonDescription && button.ButtonPosition == this.ButtonPosition && button.ButtonPressedEvent == this.ButtonPressedEvent)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            if(obj is DebugMFDButton button)
+            {
+                if (button.ButtonDescription == this.ButtonDescription && button.ButtonPosition == this.ButtonPosition && button.ButtonPressedEvent == this.ButtonPressedEvent)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 1361224670;
+            hashCode = hashCode * -1521134295 + ButtonPosition.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ButtonDescription);
+            hashCode = hashCode * -1521134295 + EqualityComparer<UnityAction>.Default.GetHashCode(ButtonPressedEvent);
+            return hashCode;
+        }
+
+        public static bool operator ==(DebugMFDButton lhs, DebugMFDButton rhs)
+        {
+            if (rhs.ButtonDescription == lhs.ButtonDescription && rhs.ButtonPosition == lhs.ButtonPosition && rhs.ButtonPressedEvent == lhs.ButtonPressedEvent)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public static bool operator !=(DebugMFDButton lhs, DebugMFDButton rhs)
+        {
+            if (rhs.ButtonDescription != lhs.ButtonDescription && rhs.ButtonPosition != lhs.ButtonPosition && rhs.ButtonPressedEvent != lhs.ButtonPressedEvent)
             {
                 return true;
             }
